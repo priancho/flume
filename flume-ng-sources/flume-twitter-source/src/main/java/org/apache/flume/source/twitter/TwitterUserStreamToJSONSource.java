@@ -203,9 +203,9 @@ public class TwitterUserStreamToJSONSource
   private byte[] serializeToJSON(List<String> docList)
       throws IOException {
     serializationBuffer.reset();
-    for (String doc2 : docList) {
-      serializationBuffer.write(doc2.getBytes(charset));
-    }
+    serializationBuffer.write(
+      StringUtils.join(docList, '\n').getBytes(charset)
+    );
     return serializationBuffer.toByteArray();
   }
 
