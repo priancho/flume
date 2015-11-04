@@ -178,15 +178,16 @@ public class TwitterUserStreamToJSONSource
     if (docs.size() >= maxBatchSize ||
         System.currentTimeMillis() >= batchEndTime) {
       batchEndTime = System.currentTimeMillis() + maxBatchDurationMillis;
-      byte[] bytes;
+
+      List<Event> events;
       try {
-        bytes = serializeToJSON(docs);
+        events = buildEvents(docs);
       } catch (IOException e) {
         LOGGER.error("Exception while serializing tweet", e);
         return; //skip
       }
-      Event event = EventBuilder.withBody(bytes);
-      getChannelProcessor().processEvent(event); // send event to the flume sink
+      // getChannelProcessor().processEvent(event); // send event to the flume sink
+      getChannelProcessor().processEventBatch(events); // send event to the flume sink
       docs.clear();
     }
     
@@ -200,13 +201,19 @@ public class TwitterUserStreamToJSONSource
     }
   }
 
-  private byte[] serializeToJSON(List<String> docList)
+  private List<Event> buildEvents(List<String> docList)
       throws IOException {
-    serializationBuffer.reset();
-    serializationBuffer.write(
-      StringUtils.join(docList, '\n').getBytes(charset)
-    );
-    return serializationBuffer.toByteArray();
+    List<Event> events = new ArrayList<Event>();
+
+    for(String doc : docList) {
+      serializationBuffer.reset();
+      serializationBuffer.write(doc.getBytes(charset));
+
+      Event event = EventBuilder.withBody(serializationBuffer.toByteArray());
+      events.add(event);
+    };
+
+    return events;
   }
 
   private void logStats() {
