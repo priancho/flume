@@ -59,7 +59,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 /**
  * Demo Flume source that connects via Streaming API to the 1% sample twitter
- * firehose, continously downloads tweets, converts them to Avro format and
+ * firehose, continuously downloads tweets, converts them to Avro format and
  * sends Avro events to a downstream Flume sink.
  *
  * Requires the consumer and access tokens and secrets of a Twitter developer
@@ -123,12 +123,16 @@ public class TwitterSource
     if (StringUtils.isNotEmpty(proxyPassword))
       cb.setHttpProxyPassword(proxyPassword);
 
+//<<<<<<< HEAD
     LOGGER.info("Consumer Key:        '" + consumerKey + "'");
     LOGGER.info("Consumer Secret:     '" + consumerSecret + "'");
     LOGGER.info("Access Token:        '" + accessToken + "'");
     LOGGER.info("Access Token Secret: '" + accessTokenSecret + "'");
 
     twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+//=======
+//    twitterStream = new TwitterStreamFactory().getInstance();
+//>>>>>>> upstream/flume-1.7
     twitterStream.setOAuthConsumer(consumerKey, consumerSecret);
     twitterStream.setOAuthAccessToken(new AccessToken(accessToken,
                                                       accessTokenSecret));
